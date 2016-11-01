@@ -1,3 +1,34 @@
-<h1>
-  {{title}}
-</h1>
+<progress value="0" max="100" id="uploader">0%</progress>
+<input type="file" id="filebutton" value="upload">
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCHeN-Y9QA6dKHP9mYPF93yHXFDL-4o4nU",
+    authDomain: "to-do-mat2.firebaseapp.com",
+    databaseURL: "https://to-do-mat2.firebaseio.com",
+    storageBucket: "to-do-mat2.appspot.com",
+    messagingSenderId: "239514467093"
+  };
+  firebase.initializeApp(config);
+  var uploader = document.getElementById("uploader");
+  var fileButton = document.getElementById("filebutton");
+  fileButton.addEventListener('change', function(e){
+  	var file = e.target.files[0];
+  	var storageref = firebase.storage().ref('imageUploads/'+file.name);
+  	var task = storageref.put(file);
+  	task.on('state_changed',
+  			function progress(snapshot){
+  				var percentage = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+  				uploader.value=percentage;
+  				console.log(percentage);
+  			},
+  			function error(err){
+
+  			},
+  			function complete(){
+
+  			}
+  		);
+  });
+</script>
