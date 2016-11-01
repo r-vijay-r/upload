@@ -1,36 +1,35 @@
 import { Component, EventEmitter } from '@angular/core';
 import * as firebase from 'firebase';
+import { AngularFire, FirebaseListObservable, AngularFireModule } from 'angularfire2';
+import "rxjs/add/operator/map";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-	title = 'app works!';
-	percentage:number;
-	imageuploaded="notSet";
-	url:boolean=false;
-  	interval;
-  	storageref;
-  	storage;
-  	path;
-  constructor(){
-  	this.percentage=0;
-  	let config = {
-    apiKey: "AIzaSyCHeN-Y9QA6dKHP9mYPF93yHXFDL-4o4nU",
-    authDomain: "to-do-mat2.firebaseapp.com",
-    databaseURL: "https://to-do-mat2.firebaseio.com",
-    storageBucket: "to-do-mat2.appspot.com"
-  	};
-  	firebase.initializeApp(config);
-  	this.storage =firebase.storage().ref();
+  title = 'app works!';
+  percentage:number;
+  imageuploaded="notSet";
+  url:boolean=false;
+    interval;
+    storageref;
+    storage;
+    path;
+    reset:boolean=true;
+    urlList:FirebaseListObservable<any[]>;
+  constructor(public af:AngularFire){
+    this.percentage=0;
+    this.storage =firebase.storage().ref();
+    this.urlList=af.database.list('/images').map((array) => array.reverse()) as FirebaseListObservable<any[]>;
   }
   filebuttoni(event){
     this.imageuploaded="notSet";
   	let files = event.srcElement.files[0];
   	let uploader=document.getElementById("uploader");
-  	this.path="images/"+files.name;
+    let date= new Date();
+  	this.path="images/"+files.name+"("+date+")";
   	this.storageref=this.storage.child(this.path);
   	let task=this.storageref.put(files);
   	let imageuploaded;
@@ -49,7 +48,19 @@ export class AppComponent {
         this.storageref=this.storage.child(this.path).getDownloadURL().then(url=>
           this.imageuploaded=url
     	  );
-      }else{clearInterval(this.interval);}
+      }else{
+        this.urlList.push({"path":this.path, "image":this.imageuploaded});
+        clearInterval(this.interval);
+        this.resetFunction();
+      }
     },500);
+  }
+  resetFunction(){
+    this.reset=false;
+    setTimeout(()=>{this.reset=true},0);
+  }
+  delete(path, key){
+    this.urlList.remove(key);
+    this.storage.child(path).delete();
   }
 }

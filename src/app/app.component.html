@@ -1,2 +1,3 @@
-<img *ngIf="imageuploaded!=='notSet'" [src]="imageuploaded" style="width:50%; height: 50%;"><hr>
-<input type="file" id="filebutton" value="upload" #filebtn (change)="filebuttoni($event)">
+<input *ngIf="reset" type="file" id="filebutton" value="upload" #filebtn (change)="filebuttoni($event)">
+<hr>uploaded files:<br>
+<div *ngFor="let item of urlList | async" style="float:left; width:100px;"><img src="{{item.image}}"><button (click)="delete(item.path, item.$key)">X</button></div>
