@@ -27,6 +27,7 @@ export class AppComponent {
   	this.storage =firebase.storage().ref();
   }
   filebuttoni(event){
+    this.imageuploaded="notSet";
   	let files = event.srcElement.files[0];
   	let uploader=document.getElementById("uploader");
   	this.path="images/"+files.name;
@@ -38,16 +39,17 @@ export class AppComponent {
   	task.on('state_changed',
   		function progress(snapshot){
   			percentage=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
-  		}
+  		},
+      this.chk()
   	);
   }
   chk(){
-  	let imageuploaded;
-  	this.storageref=this.storage.child(this.path).getDownloadURL().then(function(url) {url=>
-  		imageuploaded=url;
-  	});
-  	console.log(imageuploaded);
-  	this.imageuploaded=imageuploaded;
-  	console.log(this.path);
+    this.interval=setInterval(()=>{
+      if(this.imageuploaded=="notSet"){
+        this.storageref=this.storage.child(this.path).getDownloadURL().then(url=>
+          this.imageuploaded=url
+    	  );
+      }else{clearInterval(this.interval);}
+    },500);
   }
 }

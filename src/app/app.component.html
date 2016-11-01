@@ -1,3 +1,2 @@
+<img *ngIf="imageuploaded!=='notSet'" [src]="imageuploaded" style="width:50%; height: 50%;"><hr>
 <input type="file" id="filebutton" value="upload" #filebtn (change)="filebuttoni($event)">
-<img [src]="imageuploaded">
-<button (click)="chk()" >chk</button>
