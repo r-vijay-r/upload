@@ -1,3 +1,6 @@
-<input *ngIf="reset" type="file" id="filebutton" value="upload" #filebtn (change)="filebuttoni($event)">
+<div><input *ngIf="reset" type="file" id="filebutton" value="upload" #filebtn (change)="filebuttoni($event)"> 
+<progress value="{{prog}}" max="100"><div id="percentageprog"></div></progress> 
 <hr>uploaded files:<br>
-<div *ngFor="let item of urlList | async" style="float:left; width:100px;"><img src="{{item.image}}"><button (click)="delete(item.path, item.$key)">X</button></div>
+<div *ngFor="let item of urlList | async" style="float:left; width:100px;"><button (click)="delete(item.path, item.$key,item.image)">X</button><img src="{{item.image}}" (click)="displayImage(item.image)" style="cursor: pointer;" [class.active]="displaypic==item.image"></div></div>
+<div *ngIf="selected">
+<img src="{{displaypic}}" style="width: 50%;"></div>

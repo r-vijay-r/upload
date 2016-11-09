@@ -17,12 +17,22 @@ export class AppComponent {
     storageref;
     storage;
     path;
+    displaypic;
+    selected:boolean=false;
+    prog;
     reset:boolean=true;
     urlList:FirebaseListObservable<any[]>;
   constructor(public af:AngularFire){
     this.percentage=0;
     this.storage =firebase.storage().ref();
     this.urlList=af.database.list('/images').map((array) => array.reverse()) as FirebaseListObservable<any[]>;
+    setInterval(()=>{var prog=document.getElementById("percentageprog").innerHTML;
+          if(prog!=""){
+            this.prog=parseInt(prog);
+          }else{
+            this.prog=0;
+          }
+        },0);
   }
   filebuttoni(event){
     this.imageuploaded="notSet";
@@ -38,16 +48,18 @@ export class AppComponent {
   	task.on('state_changed',
   		function progress(snapshot){
   			percentage=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
-  		},
+        document.getElementById("percentageprog").innerHTML=percentage;
+        console.log(percentage);
+      },
       this.chk()
-  	);
+    );
   }
   chk(){
     this.interval=setInterval(()=>{
       if(this.imageuploaded=="notSet"){
         this.storageref=this.storage.child(this.path).getDownloadURL().then(url=>
           this.imageuploaded=url
-    	  );
+        );
       }else{
         this.urlList.push({"path":this.path, "image":this.imageuploaded});
         clearInterval(this.interval);
@@ -56,11 +68,23 @@ export class AppComponent {
     },500);
   }
   resetFunction(){
+    document.getElementById("percentageprog").innerHTML="";
     this.reset=false;
     setTimeout(()=>{this.reset=true},0);
   }
-  delete(path, key){
+  delete(path, key, val){
     this.urlList.remove(key);
     this.storage.child(path).delete();
+    if(this.displaypic==val){this.selected=false;}
+    
+  }
+  displayImage(path:string){
+    if(this.displaypic==path && this.selected==true){
+      this.selected=false;
+      this.displaypic="";
+    }else{
+      this.selected=true;
+      this.displaypic=path;
+    }
   }
 }
